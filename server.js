@@ -1,5 +1,6 @@
 ///// IMPORT & INIT EXPRESS FRAMEWORK /////
 ///////////////////////////////////////////
+require('dotenv').config(); //Import dotenv Library to use environment variables
 const express = require('express'); // Import express Framework
 const app = express(); //Init express
 
@@ -18,9 +19,9 @@ app.use(express.json()); // Add preprocessor that it provides to get the body as
 
 ///// DEFINE CONTROLLERS /////
 //////////////////////////////
-// const userController = require('./controllers/UserController');
-// const authController = require('./controllers/AuthController');
-// const accountControler = require('./controllers/AccountController');
+const userController = require('./controllers/UserController');
+const authController = require('./controllers/AuthController');
+const accountControler = require('./controllers/AccountController');
 
 
 ///// CORS OPTIONS TO ENABLED IT /////
@@ -39,20 +40,9 @@ app.use(express.json()); // Add preprocessor that it provides to get the body as
 
 ///// DEFINE API METHODS/////
 /////////////////////////////
-// GET user
-// app.get("/vibank/v1/user", userController.getUserV1);
 
-// // GET user by ID
-// app.get("/vibank/v1/user/:id", userController.getUserByIdV1);
+// Get users V1
+app.get("/vibank/v1/user", userController.getUsersV1);
 
-// // POST user
-// app.post("/vibank/v1/user", userController.createUserV1);
-
-// // POST for Login user
-// app.post("/vibank/v1/login", authController.loginUserV1);
-
-// // POST to Logout User
-// app.post("/vibank/v1/logout/:id", authController.logoutUserV1);
-
-// // GET accounts by ID
-// app.get("/vibank/v1/account/:id", accountControler.getAccountByIdV1);
+// Get users by ID V1
+app.get("/vibank/v1/user/:id", userController.getUsersByIdV1);
