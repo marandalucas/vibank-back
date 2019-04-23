@@ -51,7 +51,7 @@ function getUsersByIdV1(req, res) {
       } else {
         if (body.length > 0) {
           var response = body[0];
-          console.log("SUCESS Found user with id -> " + id);
+          console.log("SUCCESS Found user with id -> " + id);
         } else {
           var response = {
             "msg" : "ERROR User not found"
@@ -87,7 +87,7 @@ function createUserV1(req,res) {
       res.status(500);
     }else {
       var response = {
-        "msg": "SUCESS created user"
+        "msg": "SUCCESS created user"
       }
       res.status(201);
     }
