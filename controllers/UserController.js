@@ -1,6 +1,6 @@
 ///// DECLARE CONST /////
-const requestJson = require('request-json'); // Para cargar la librería de request-json
-const crypt =require("../utils/crypt"); // Cargamos librería de encriptación
+const requestJson = require('request-json'); // Import request-json Library
+const crypt =require("../utils/crypt"); // Import encrypt Library
 
 const baseMLABUrl = "https://api.mlab.com/api/1/databases/apitechumal12ed/collections/";
 const mLabAPIKey = "apiKey=" + process.env.MLAB_API_KEY;
@@ -9,7 +9,7 @@ const mLabUserCollection = "vibankuser?";
 
 ////// FUNCTIONS //////
 
-// Get all users
+// Get all users V1
 function getUsersV1(req, res) {
   console.log("GET /vibank/v1/user");
 
@@ -27,7 +27,7 @@ function getUsersV1(req, res) {
   );
 }
 
-// Get User By ID
+// Get User By ID V1
 function getUsersByIdV1(req, res) {
   console.log("GET /vibank/v1/user/:id")
 
