@@ -49,3 +49,6 @@ app.get("/vibank/v1/user/:id", userController.getUsersByIdV1);
 
 // Post users V1
 app.post("/vibank/v1/user", userController.createUserV1);
+
+// Login user V2 with real database
+app.post("/vibank/v1/login", authController.loginUserV1);
