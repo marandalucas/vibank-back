@@ -46,3 +46,6 @@ app.get("/vibank/v1/user", userController.getUsersV1);
 
 // Get users by ID V1
 app.get("/vibank/v1/user/:id", userController.getUsersByIdV1);
+
+// Post users V1
+app.post("/vibank/v1/user", userController.createUserV1);
