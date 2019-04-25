@@ -5,7 +5,7 @@ const express = require('express'); // Import express Framework
 const app = express(); //Init express
 
 
-///// SERVER PROPERTIES /////
+///// SERVER PROPERTIES //////
 //////////////////////////////
 const port = process.env.PORT || 3000; // Get server Port from env PORT or use default port 3000.
 app.listen(port); // This allow start the server listening in port 3000.
