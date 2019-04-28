@@ -66,7 +66,7 @@ function getUsersByIdV1(req, res) {
 }
 
 function createUserV1(req,res) {
-  console.log("---------------\nPOST /vibank/v1/user");
+  console.log("POST /vibank/v1/user");
 
   var newUser={
     "id" :req.body.id,
