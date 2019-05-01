@@ -51,9 +51,48 @@ function loginUserV1(req, res) {
   );
  }
 
+ function logoutUserV1(req, res) {
+  console.log("POST /vibank/v1/logout/:id");
+
+  var id = Number.parseInt(req.params.id);
+  var query = "q=" + JSON.stringify({"id": id});
+  console.log("query es " + query);
+
+  httpClient = requestJson.createClient(baseMLABUrl);
+  httpClient.get(mLabUserCollection + "?" + query + "&" + mLabAPIKey,
+    function(err, resMLab, body) {
+      if (body.length == 0) {
+        var response = {
+          "msg" : "ERROR - Incorrect Logout, user don't found"
+        }
+        res.send(response);
+      } else {
+        console.log("Function logoutUserV1 - Got a user with that id, logging out");
+        id = Number.parseInt(body[0].id);
+        query = "q=" + JSON.stringify({"id": id});
+        console.log("Function logoutUserV1 - Query for put is " + query);
+        var putBody = '{"$unset":{"logged":""}}'
+        httpClient.put(mLabUserCollection + "?" + query + "&" + mLabAPIKey, JSON.parse(putBody),
+          function(errPUT, resMLabPUT, bodyPUT) {
+            console.log("Function logoutUserV1 - PUT done");
+            var response = {
+              "msg" : "SUCESS - User logout",
+              "userID" : body[0].id
+            }
+            res.send(response);
+          }
+        )
+      }
+    }
+  );
+ }
+
 
 ////// MODULE EXPORTS ///////
 /////////////////////////////
 
 // Login User V1
 module.exports.loginUserV1 = loginUserV1;
+
+// Logout User V1
+module.exports.logoutUserV1 = logoutUserV1;
