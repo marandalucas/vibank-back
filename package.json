@@ -4,7 +4,7 @@
   "description": "vivank-back nodejs api project",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --exit --timeout 10000",
+    "test": "node server.js & sleep 3 && mocha --exit --timeout 10000 && pkill -9 node",
     "start": "nodemon server.js"
   },
   "repository": {
