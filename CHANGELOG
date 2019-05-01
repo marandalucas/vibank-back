@@ -1,0 +1,49 @@
+# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [1.1.0] - 2019-05-01
+### Added
+- __Login Users.__
+- __Logout Users.__
+
+### Changed
+- Nothing.
+
+### Removed
+- Nothing.
+
+### Fixed
+- Nothing
+
+## [1.0.0] - 2019-04-23
+### Added
+- __Get Users.__
+- __Get Users by ID.__
+- __Create Users with encrypted password using bcrypt.__
+
+### Changed
+- Nothing.
+
+### Removed
+- Nothing.
+
+### Fixed
+- Nothing
+
+## [0.1.0] - 2019-04-12
+### Added
+- __Create Initial Scaffolding.__
+
+### Changed
+- Nothing.
+
+### Removed
+- Nothing.
+
+### Fixed
+- Nothing
