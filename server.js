@@ -27,16 +27,16 @@ const operController = require('./controllers/OperController');
 
 ///// CORS OPTIONS TO ENABLED IT /////
 //////////////////////////////////////
-// var enableCORS = function(req, res, next) {
-//   res.set("Access-Control-Allow-Origin", "*");
-//   res.set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
+var enableCORS = function(req, res, next) {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
 
-//   // This will be needed.
-//   res.set("Access-Control-Allow-Headers", "Content-Type");
+  // This will be needed.
+  res.set("Access-Control-Allow-Headers", "Content-Type");
 
-//   next();
-//  }
-// app.use(enableCORS); // Enabled to use CORS
+  next();
+ }
+app.use(enableCORS); // Enabled to use CORS
 
 
 ///// DEFINE API METHODS/////
@@ -59,6 +59,9 @@ app.get("/vibank/v1/oper", operController.getOpersV1);
 
 // Get account oper by ID V1
 app.get("/vibank/v1/oper/:id", operController.getOpersByIdV1);
+
+// Get account opers by Id Account V1
+app.get("/vibank/v1/accountopers/:idaccount", operController.getOpersByIdAccountV1);
 
 // Post opers V1
 app.post("/vibank/v1/oper", operController.createOperV1);

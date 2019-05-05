@@ -7,7 +7,6 @@ const baseMLABUrl = "https://api.mlab.com/api/1/databases/apitechumal12ed/collec
 const mLabAPIKey = "apiKey=" + process.env.MLAB_API_KEY;
 const mLabUserCollection = "vibankuser";
 
-
 ////// FUNCTIONS //////
 ///////////////////////
 
