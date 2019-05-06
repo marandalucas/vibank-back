@@ -33,7 +33,7 @@ function getAccountByIdV1(req, res) {
           var response = body;
         } else {
           var response = {
-            "msg" : "ERROR: user not found"
+            "msg" : "ERROR: account not found"
           }
           res.status(404);
         }
@@ -43,4 +43,52 @@ function getAccountByIdV1(req, res) {
   )
 }
 
+function createAccountV1(req,res) {
+  console.log("---------------\nPOST /vibank/v1/account");
+
+  // Generate Random Account
+  var randomAccount = "ES32 " + getRandomInt(1,9999) +  " 7701 " + getRandomInt(1,9999) +  " 6520 " + getRandomInt(1,9999);
+  console.log(randomAccount);
+
+  var newAccount={
+    "IBAN": randomAccount,
+    "userID" :req.body.userID,
+    "balance" :req.body.balance
+  }
+  console.log(newAccount);
+  var httpClient=requestJson.createClient(baseMLABUrl);
+
+  httpClient.post(mLabAccountCollection + "?" +mLabAPIKey,newAccount,
+  function(err,resMlab, body){
+    if(err){
+      var response = {
+        "msg": "ERROR creating account"
+      }
+      res.status(500);
+    }else {
+      var response = {
+        "msg": "SUCCESS created account"
+      }
+      res.status(201);
+    }
+    res.send(response);
+  }
+  );
+}
+
+////// MODULE EXPORTS ///////
+/////////////////////////////
+
+// Get Account
 module.exports.getAccountByIdV1 = getAccountByIdV1;
+
+// Create Account
+module.exports.createAccountV1 = createAccountV1;
+
+/////////////////////
+///// FUNCTIONS /////
+/////////////////////
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
