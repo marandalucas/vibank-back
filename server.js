@@ -55,3 +55,9 @@ app.post("/vibank/v1/login", authController.loginUserV1);
 
 // Post Logout users V1
 app.post("/vibank/v1/logout/:id", authController.logoutUserV1);
+
+// Get account by ID V1
+app.get("/vibank/v1/account/:id", accountControler.getAccountByIdV1);
+
+// Create account
+app.post("/vibank/v1/account/", accountControler.createAccountV1);
