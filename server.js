@@ -5,7 +5,7 @@ const express = require('express'); // Import express Framework
 const app = express(); //Init express
 
 
-///// SERVER PROPERTIES /////
+///// SERVER PROPERTIES //////
 //////////////////////////////
 const port = process.env.PORT || 3000; // Get server Port from env PORT or use default port 3000.
 app.listen(port); // This allow start the server listening in port 3000.
@@ -21,21 +21,22 @@ app.use(express.json()); // Add preprocessor that it provides to get the body as
 //////////////////////////////
 const userController = require('./controllers/UserController');
 const authController = require('./controllers/AuthController');
-const accountControler = require('./controllers/AccountController');
+const AccountController = require('./controllers/AccountController');
+const operController = require('./controllers/OperController');
 
 
 ///// CORS OPTIONS TO ENABLED IT /////
 //////////////////////////////////////
-// var enableCORS = function(req, res, next) {
-//   res.set("Access-Control-Allow-Origin", "*");
-//   res.set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
+var enableCORS = function(req, res, next) {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
 
-//   // This will be needed.
-//   res.set("Access-Control-Allow-Headers", "Content-Type");
+  // This will be needed.
+  res.set("Access-Control-Allow-Headers", "Content-Type");
 
-//   next();
-//  }
-// app.use(enableCORS); // Enabled to use CORS
+  next();
+ }
+app.use(enableCORS); // Enabled to use CORS
 
 
 ///// DEFINE API METHODS/////
@@ -57,7 +58,19 @@ app.post("/vibank/v1/login", authController.loginUserV1);
 app.post("/vibank/v1/logout/:id", authController.logoutUserV1);
 
 // Get account by ID V1
-app.get("/vibank/v1/account/:id", accountControler.getAccountByIdV1);
+app.get("/vibank/v1/account/:id", AccountController.getAccountByIdV1);
 
 // Create account
-app.post("/vibank/v1/account/", accountControler.createAccountV1);
+app.post("/vibank/v1/account/", AccountController.createAccountV1);
+
+// Get account opers V1
+app.get("/vibank/v1/oper", operController.getOpersV1);
+
+// Get account oper by ID V1
+app.get("/vibank/v1/oper/:id", operController.getOpersByIdV1);
+
+// Get account opers by Id Account V1
+app.get("/vibank/v1/accountopers/:idaccount", operController.getOpersByIdAccountV1);
+
+// Post opers V1
+app.post("/vibank/v1/oper", operController.createOperV1);

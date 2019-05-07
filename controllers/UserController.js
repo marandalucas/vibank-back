@@ -7,7 +7,6 @@ const baseMLABUrl = "https://api.mlab.com/api/1/databases/apitechumal12ed/collec
 const mLabAPIKey = "apiKey=" + process.env.MLAB_API_KEY;
 const mLabUserCollection = "vibankuser";
 
-
 ////// FUNCTIONS //////
 ///////////////////////
 
@@ -66,7 +65,7 @@ function getUsersByIdV1(req, res) {
 }
 
 function createUserV1(req,res) {
-  console.log("---------------\nPOST /vibank/v1/user");
+  console.log("POST /vibank/v1/user");
 
   var newUser={
     "id" :req.body.id,
