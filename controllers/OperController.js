@@ -90,7 +90,6 @@ function getOpersByIdAccountV1(req, res) {
         if (body.length > 0) {
           var response = body;
           console.log("SUCCESS Found user with Id Account -> " + idaccount);
-                    console.log(response);
         } else {
           var response = {
             "msg" : "ERROR Operation not found"
@@ -107,12 +106,12 @@ function getOpersByIdAccountV1(req, res) {
 function createOperV1(req,res) {
 
   console.log("POST /vibank/v1/oper");
+
+  var sign, descTypeOper, IBANOri, IBANDest, saldoFinalDest, saldoFinalOri, idOper, putBody, query;
   var httpClient = requestJson.createClient(baseMLABUrl);
 
-  // Se valida el tipo de operacion
-  var sign, descTypeOper, IBAN, saldoFinal, idOper;
-
-  var query = "q=" + JSON.stringify({"idtype": req.body.operType});
+  // Validamos que exista el tipo de operacion
+  query = "q=" + JSON.stringify({"idtype": req.body.operType});
   httpClient.get(mLabOperTypeCollection  + "?"  + query + "&" + mLabAPIKey,
   function(err,resMlab, body){
      if(err){
@@ -123,26 +122,24 @@ function createOperV1(req,res) {
         sign = body[0].sign;
         descOperType = body[0].descAbr;
 
-        var query = "q=" + JSON.stringify({"id": req.body.idAccount});
+        // Consultamos la información de la cuenta
+        query = "q=" + JSON.stringify({"id": req.body.idAccount});
         httpClient.get(mLabAccountCollection  + "?"  + query + "&" + mLabAPIKey,
             function(errAccount, resMlabAccount, bodyAccount) {
                 if (body.length > 0){
 
-                   var id = Number.parseInt(bodyAccount[0].id);
-                   IBAN = body[0].IBAN;
-                   query = "q=" + JSON.stringify({"id": id});
-
-                   console.log("Saldo inicial: " + saldoFinal);
+                   var idAccountOri = Number.parseInt(bodyAccount[0].id);
+                   IBANOri = bodyAccount[0].IBAN;
+                   query = "q=" + JSON.stringify({"id": idAccountOri});
 
                    if (sign == "+"){ // tipo de operacion ingreso
-                       saldoFinal = bodyAccount[0].balance + req.body.amount;
+                       saldoFinalOri = bodyAccount[0].balance + req.body.amount;
                    }else if (sign == "-"){
-                       saldoFinal = bodyAccount[0].balance - req.body.amount;
+                       saldoFinalOri = bodyAccount[0].balance - req.body.amount;
                    }
 
-                   console.log("Actualizo el saldo a " + saldoFinal);
-                   var putBody = '{"$set":{"balance":' + saldoFinal + '}}';
-
+                   // Actualizamos el saldo de la cuenta
+                   putBody = '{"$set":{"balance":' + saldoFinalOri + '}}';
                    httpClient.put(mLabAccountCollection + "?" + query + "&" + mLabAPIKey, JSON.parse(putBody),
                       function(errUpAccount, resMLabUpAccount, bodyUpAccount) {
                          if(errUpAccount){
@@ -153,9 +150,8 @@ function createOperV1(req,res) {
 
                            console.log("Accediendo a parametros");
 
-                           var httpClient = requestJson.createClient(baseMLABUrl);
-
-                           var query = "q=" + JSON.stringify({"idparam":"operCount"});
+                           // Obtenemos el valor actual del contador de operaciones
+                           query = "q=" + JSON.stringify({"idparam":"operCount"});
                            httpClient.get(mLabParamsCollection  + "?"  + query + "&" + mLabAPIKey,
                                function(errParams,resMlabParams, bodyParams){
                                   if(errParams){
@@ -164,21 +160,33 @@ function createOperV1(req,res) {
                                       res.send(response);
                                   }else {
                                       idOper = Number.parseInt(bodyParams[0].value) + 1;
-                                      var newOper={
-                                        "idOper" :idOper,
-                                        "idAccount" :req.body.idAccount,
-                                        "IBAN" :req.body.IBAN,
-                                        "operType" :req.body.operType,
-                                        "descOperType":descOperType,
-                                        "amount" :req.body.amount,
-                                        "sign" :sign,
-                                        "balance" :saldoFinal
+                                      if (req.body.operType == 1 || req.body.operType == 2){
+                                          var newOper={
+                                            "idOper" :idOper,
+                                            "idAccount" :idAccountOri,
+                                            "IBAN" :IBANOri,
+                                            "operType" :req.body.operType,
+                                            "descOperType":descOperType,
+                                            "amount" :req.body.amount,
+                                            "sign" :sign,
+                                            "balance" :saldoFinalOri
+                                          }
+                                      }else{
+                                          var newOper={
+                                            "idOper" :idOper,
+                                            "idAccount" :idAccountOri,
+                                            "IBAN" :IBANOri,
+                                            "operType" :req.body.operType,
+                                            "descOperType":descOperType,
+                                            "destinationName":req.body.destinationName,
+                                            "concept":req.body.concept,
+                                            "amount" :req.body.amount,
+                                            "sign" :sign,
+                                            "balance" :saldoFinalOri
+                                          }
                                       }
 
-                                      console.log(newOper);
-
-                                      var httpClient=requestJson.createClient(baseMLABUrl);
-
+                                      //Insertamos el nuevo movimiento
                                       httpClient.post(mLabOperCollection + "?" + mLabAPIKey,newOper,
                                       function(errOper,resMlabOper, bodyOper){
                                           if(errOper){
@@ -187,7 +195,12 @@ function createOperV1(req,res) {
                                              res.send(response);
                                            }else {
 
-                                             var putBody = '{"$set":{"value":' + idOper + '}}';
+                                             // Actualizamos el contador de operaciones
+                                             if(req.body.operType == 3 ||req.body.operType == 4){
+                                                idOper = idOper + 1; // en caso de transferencia actualizo con 2 movimientos
+                                             }
+
+                                             putBody = '{"$set":{"value":' + idOper + '}}';
                                              httpClient.put(mLabParamsCollection + "?" + query + "&" + mLabAPIKey, JSON.parse(putBody),
                                                 function(errUpParams, resMLabUpParams, bodyUpParams) {
                                                    if(errUpParams){
@@ -195,9 +208,72 @@ function createOperV1(req,res) {
                                                       res.status(500);
                                                       res.send(response);
                                                    }else{
-                                                      var response = {"msg": "SUCCESS created operation"}
-                                                      res.status(201);
-                                                      res.send(response);
+                                                     // En caso de transferencia realizo las acciones de la cuenta destino
+                                                     if(req.body.operType == 3 ||req.body.operType == 4){
+
+                                                        query = "q=" + JSON.stringify({"IBAN": req.body.IBANDest});
+                                                        httpClient.get(mLabAccountCollection  + "?"  + query + "&" + mLabAPIKey,
+                                                            function(errAccountDest, resMlabAccountDest, bodyAccountDest) {
+                                                                if (body.length > 0){
+                                                                    var idAccountDest = Number.parseInt(bodyAccountDest[0].id);
+                                                                    IBANDest = bodyAccountDest[0].IBAN;
+                                                                    saldoFinalDest = bodyAccountDest[0].balance + req.body.amount;
+                                                                    sign = "+";
+
+                                                                    query = "q=" + JSON.stringify({"id": idAccountDest});
+                                                                    putBody = '{"$set":{"balance":' + saldoFinalDest + '}}';
+                                                                    httpClient.put(mLabAccountCollection + "?" + query + "&" + mLabAPIKey, JSON.parse(putBody),
+                                                                       function(errUpAccountDest, resMLabUpAccountDest, bodyUpAccountDest) {
+                                                                          if(errUpAccountDest){
+                                                                             var response = {"msg": "ERROR actualizando saldo cuenta destino"}
+                                                                             res.status(500);
+                                                                             res.send(response);
+                                                                          }else{
+                                                                             var newOper={
+                                                                                 "idOper" :idOper,
+                                                                                 "idAccount" :idAccountDest,
+                                                                                 "IBAN" :IBANDest,
+                                                                                 "operType" :req.body.operType,
+                                                                                 "descOperType":descOperType,
+                                                                                 "destinationName":req.body.destinationName,
+                                                                                 "concept":req.body.concept,
+                                                                                 "amount" :req.body.amount,
+                                                                                 "sign" :sign,
+                                                                                 "balance" :saldoFinalDest
+                                                                              }
+
+                                                                             //Insertamos el nuevo movimiento de la cuenta destino
+                                                                             httpClient.post(mLabOperCollection + "?" + mLabAPIKey,newOper,
+                                                                             function(errOper,resMlabOper, bodyOper){
+                                                                                 if(errOper){
+                                                                                    var response = {"msg": "ERROR creating operation"}
+                                                                                    res.status(500);
+                                                                                    res.send(response);
+                                                                                  }else{
+                                                                                     var response = {"msg": "SUCCESS created operation"}
+                                                                                     res.status(201);
+                                                                                     res.send(response);
+                                                                                  }
+                                                                                }
+                                                                              );
+
+                                                                          }
+                                                                        }
+                                                                     );
+
+                                                                 }else{
+                                                                    var response = {"msg" : "Cuenta destino inexistente"}
+                                                                    res.status(401);
+                                                                    res.send(response);
+                                                                 }
+                                                               }
+                                                             );
+                                                           }else{
+                                                             var response = {"msg": "SUCCESS created operation"}
+                                                             res.status(201);
+                                                             res.send(response);
+                                                           }
+
                                                    }
                                                 }
                                               );
