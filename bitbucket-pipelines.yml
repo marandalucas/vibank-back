@@ -1,0 +1,81 @@
+# enable Docker for your repository
+options:
+  docker: true
+
+pipelines:
+  default:
+    - step:
+        name: NPM Build & Test
+        image: node:8.15-jessie-slim
+        script:
+            # build and test the Node app
+            - npm install
+            - npm test
+    - step:
+        name: Test Build Docker Image
+        script:
+            # build the Docker image (this will use the Dockerfile in the root of the repo)
+            - export IMAGE_NAME=${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_BACK_NAME}:${BITBUCKET_COMMIT}
+            - docker build -t $IMAGE_NAME .
+  branches:
+    develop:
+      - step:
+          name: NPM Build & Test
+          image: node:8.15-jessie-slim
+          script:
+            # build and test the Node app
+            - npm install
+            - npm test
+      - step:
+          name: Build Docker Image & Docker Push Image
+          script:
+            # Get Project Version
+            - export IMAGE_TAG="$(node -e "console.log(require('./package.json').version);")"
+            - export IMAGE_TAG_SNAPSHOT=${IMAGE_TAG}-SNAPSHOT
+            - export IMAGE_NAME=${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_BACK_NAME}:${IMAGE_TAG_SNAPSHOT}
+            # build the Docker image (this will use the Dockerfile in the root of the repo)
+            - docker build -t $IMAGE_NAME .
+            # authenticate with the Docker Hub registry
+            - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+            # push the new Docker image to the Docker registry
+            - docker push $IMAGE_NAME
+    master:
+      - step:
+          name: NPM Build & Test
+          image: node:8.15-jessie-slim
+          script:
+            # build and test the Node app
+            - npm install
+            - npm test
+      - step:
+          name: Build Docker Image & Docker Push Image
+          script:
+            # Get Project Version
+            - export IMAGE_TAG="$(node -e "console.log(require('./package.json').version);")"
+            - export IMAGE_NAME=${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_BACK_NAME}:$IMAGE_TAG
+            # build the Docker image (this will use the Dockerfile in the root of the repo)
+            - docker build -t $IMAGE_NAME .
+            # authenticate with the Docker Hub registry
+            - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+            # push the new Docker image to the Docker registry
+            - docker push $IMAGE_NAME
+      - step:
+          name: Deploy on kubernetes
+          image: sockmal/gcloud-kubectl:1.0.0
+          script:
+            # Prepare environment
+            - export CLOUDSDK_COMPUTE_ZONE=$GCLOUD_COMPUTE_ZONE
+            - export CLOUDSDK_CORE_PROJECT=$GCLOUD_CORE_PROJECT
+
+            # Authorize account:
+            - echo $GCLOUD_JSON_KEY | tee gcloud.json
+            - gcloud auth activate-service-account $GCLOUD_ACCOUNT_EMAIL --key-file gcloud.json
+
+            # Get cluster credentials:
+            - gcloud container clusters get-credentials $GCLOUD_CLUSTER_NAME
+
+            # Check kubectl credentials
+            - kubectl cluster-info
+
+            # Update the deployment to use the new Docker image
+            - kubectl set image deployment/${DOCKER_IMAGE_BACK_NAME} ${DOCKER_IMAGE_BACK_NAME}=${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_BACK_NAME}:$IMAGE_TAG

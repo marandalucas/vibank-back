@@ -21,7 +21,7 @@ app.use(express.json()); // Add preprocessor that it provides to get the body as
 //////////////////////////////
 const userController = require('./controllers/UserController');
 const authController = require('./controllers/AuthController');
-const accountController = require('./controllers/AccountController');
+const AccountController = require('./controllers/AccountController');
 const operController = require('./controllers/OperController');
 
 
@@ -51,8 +51,17 @@ app.get("/vibank/v1/user/:id", userController.getUsersByIdV1);
 // Post users V1
 app.post("/vibank/v1/user", userController.createUserV1);
 
-// Login user V2 with real database
+// Post Login user V1
 app.post("/vibank/v1/login", authController.loginUserV1);
+
+// Post Logout users V1
+app.post("/vibank/v1/logout/:id", authController.logoutUserV1);
+
+// Get account by ID V1
+app.get("/vibank/v1/account/:id", AccountController.getAccountByIdV1);
+
+// Create account
+app.post("/vibank/v1/account/", AccountController.createAccountV1);
 
 // Get account opers V1
 app.get("/vibank/v1/oper", operController.getOpersV1);
