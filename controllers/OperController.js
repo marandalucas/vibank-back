@@ -112,6 +112,7 @@ function createOperV1(req,res) {
 
   // Validamos que exista el tipo de operacion
   query = "q=" + JSON.stringify({"idtype": req.body.operType});
+  console.log("la query 1"  + query);
   httpClient.get(mLabOperTypeCollection  + "?"  + query + "&" + mLabAPIKey,
   function(err,resMlab, body){
      if(err){
@@ -124,6 +125,7 @@ function createOperV1(req,res) {
 
         // Consultamos la información de la cuenta
         query = "q=" + JSON.stringify({"id": req.body.idAccount});
+        console.log("la query 2"  + query);
         httpClient.get(mLabAccountCollection  + "?"  + query + "&" + mLabAPIKey,
             function(errAccount, resMlabAccount, bodyAccount) {
                 if (body.length > 0){
@@ -147,8 +149,6 @@ function createOperV1(req,res) {
                             res.status(500);
                             res.send(response);
                          }else{
-
-                           console.log("Accediendo a parametros");
 
                            // Obtenemos el valor actual del contador de operaciones
                            query = "q=" + JSON.stringify({"idparam":"operCount"});
@@ -221,6 +221,7 @@ function createOperV1(req,res) {
                                                                     sign = "+";
 
                                                                     query = "q=" + JSON.stringify({"id": idAccountDest});
+
                                                                     putBody = '{"$set":{"balance":' + saldoFinalDest + '}}';
                                                                     httpClient.put(mLabAccountCollection + "?" + query + "&" + mLabAPIKey, JSON.parse(putBody),
                                                                        function(errUpAccountDest, resMLabUpAccountDest, bodyUpAccountDest) {
