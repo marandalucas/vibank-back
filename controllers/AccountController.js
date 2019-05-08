@@ -17,7 +17,7 @@ function getAccountByIdV1(req, res) {
   var id = Number.parseInt(req.params.id);
   console.log("Function getAccountByIdV1 - The account id is -> " + id);
   var query = "q=" + JSON.stringify({"userID": id});
-  console.log("Function getAccountByIdV1 - The query is -> " + mLabParamsCollection + "?" + query);
+  console.log("Function getAccountByIdV1 - The query is -> " + mLabAccountCollection + "?" + query);
 
   var httpClient = requestJson.createClient(baseMLABUrl);
   console.log(query);
