@@ -82,11 +82,10 @@ function createUserV1(req,res) {
       res.status(500);
     }else {
       if (body.length > 0) {
-        // var response = body;
 
         // Increase userID +1
         userID = body[0].value +1;
-  
+
         // Define newUser body json
         var newUser={
           "id" :userID,
@@ -95,10 +94,10 @@ function createUserV1(req,res) {
           "email" :req.body.email,
           "password" :crypt.hash(req.body.password)
         }
-  
+
         // Print info about new user
         console.log("Creating new user " + newUser.first_name + " with userID " + userID);
-  
+
         // Create User with id, first_name, last_name, email and password
         httpClient.post(mLabUserCollection + "?" +mLabAPIKey,newUser,
         function(errCreateUser,resMlabUser, bodyCreateUser){
