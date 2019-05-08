@@ -51,7 +51,7 @@ function createAccountV1(req,res) {
   var randomAccount = "ES32 " + getRandomInt(1,9999) +  " 7701 " + getRandomInt(1,9999) +  " 6520 " + getRandomInt(1,9999);
   console.log(randomAccount);
 
-  // Get last accountID
+  // Get current accountID
   var query = "q=" + JSON.stringify({"idparam":"accountCount"});
   console.log("Function createAccountV1 - The query is -> " + mLabAccountCollection + "?" + query);
 
