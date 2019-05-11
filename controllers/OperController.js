@@ -12,23 +12,6 @@ const mLabParamsCollection = "vibankparameters";
 ////// FUNCTIONS //////
 ///////////////////////
 
-// Get all operations of account V1
-function getOpersV1(req, res) {
-  console.log("GET /vibank/v1/oper");
-
-  var httpClient = requestJson.createClient(baseMLABUrl);
-  console.log("Function getOpersV1 - getting vibank operations account");
-
-  httpClient.get(mLabOperCollection + "?"  + mLabAPIKey,
-    function(err, resMlab, body) {
-      var response = !err ? body : {
-        "msg" : "ERROR getting vibank operations account"
-      }
-      res.send(response);
-    }
-  );
-}
-
 // Get Operation By ID V1
 function getOpersByIdV1(req, res) {
   console.log("GET /vibank/v1/oper/:id")
@@ -73,12 +56,14 @@ function getOpersByIdAccountV1(req, res) {
   var idaccount = Number.parseInt(req.params.idaccount);
   console.log("Function getOpersByIdAccountV1 - Getting Oper Id Account " + idaccount);
   var query = "q=" + JSON.stringify({"idAccount": idaccount});
+  var sort = "s=" + JSON.stringify({"idOper": -1});
   console.log("Function getOpersByIdAccountV1 - The query is " + query);
+  console.log("Function getOpersByIdAccountV1 - The sort is " + sort);
 
   var httpClient = requestJson.createClient(baseMLABUrl);
 
   // Control the response status
-  httpClient.get(mLabOperCollection + "?"  + query + "&" + mLabAPIKey,
+  httpClient.get(mLabOperCollection + "?"  + query + "&" + sort + "&" + mLabAPIKey,
     function(err, resMlab, body) {
       if (err) {
         var response = {
@@ -89,7 +74,7 @@ function getOpersByIdAccountV1(req, res) {
       } else {
         if (body.length > 0) {
           var response = body;
-          console.log("SUCCESS Found user with Id Account -> " + idaccount);
+          console.log("SUCCESS Found operations with Id Account -> " + idaccount);
         } else {
           var response = {
             "msg" : "ERROR Operation not found"
@@ -133,9 +118,9 @@ function createOperV1(req,res) {
                    query = "q=" + JSON.stringify({"id": idAccountOri});
 
                    if (sign == "+"){ // tipo de operacion ingreso
-                       saldoFinalOri = bodyAccount[0].balance + req.body.amount;
+                       saldoFinalOri = Number.parseFloat(bodyAccount[0].balance) + Number.parseFloat(req.body.amount);
                    }else if (sign == "-"){
-                       saldoFinalOri = bodyAccount[0].balance - req.body.amount;
+                       saldoFinalOri = Number.parseFloat(bodyAccount[0].balance) - Number.parseFloat(req.body.amount);
                    }
 
                    // Actualizamos el saldo de la cuenta
@@ -217,7 +202,7 @@ function createOperV1(req,res) {
                                                                 if (body.length > 0){
                                                                     var idAccountDest = Number.parseInt(bodyAccountDest[0].id);
                                                                     IBANDest = bodyAccountDest[0].IBAN;
-                                                                    saldoFinalDest = bodyAccountDest[0].balance + req.body.amount;
+                                                                    saldoFinalDest = Number.parseFloat(bodyAccountDest[0].balance) + Number.parseFloat(req.body.amount);
                                                                     sign = "+";
 
                                                                     query = "q=" + JSON.stringify({"id": idAccountDest});
@@ -300,9 +285,6 @@ function createOperV1(req,res) {
 
 ////// MODULE EXPORTS ///////
 /////////////////////////////
-
-// Get account Operations V1
-module.exports.getOpersV1 = getOpersV1;
 
 // Get account Operations by ID V1
 module.exports.getOpersByIdV1 = getOpersByIdV1;
