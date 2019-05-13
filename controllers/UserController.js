@@ -68,6 +68,16 @@ function getUsersByIdV1(req, res) {
 function createUserV1(req,res) {
   console.log("POST /vibank/v1/user");
 
+  var newUser={
+    "id" :req.body.id,
+    "first_name" :req.body.first_name,
+    "last_name" :req.body.last_name,
+    "email" :req.body.email,
+    "password" :crypt.hash(req.body.password)
+  }
+  console.log(newUser);
+  var httpClient=requestJson.createClient(baseMLABUrl);
+
   // Get current userID
   var query = "q=" + JSON.stringify({"idparam":"userCount"});
   console.log("Function createUserV1 - The query is -> " + mLabUserCollection + "?" + query);

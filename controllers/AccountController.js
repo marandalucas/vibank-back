@@ -11,12 +11,12 @@ const mLabParamsCollection = "vibankparameters";
 
 ////// FUNCTIONS //////
 ///////////////////////
-function getAccountByIdV1(req, res) {
-  console.log("GET /vibank/v1/account/:id")
+function getAccountsByIdUserV1(req, res) {
+  console.log("GET /vibank/v1/accounts/:id")
 
-  var id = Number.parseInt(req.params.id);
-  console.log("Function getAccountByIdV1 - The account id is -> " + id);
-  var query = "q=" + JSON.stringify({"userID": id});
+  var idUser = Number.parseInt(req.params.id);
+  console.log("Function getAccountByIdV1 - The account idUser is -> " + idUser);
+  var query = "q=" + JSON.stringify({"userID": idUser});
   console.log("Function getAccountByIdV1 - The query is -> " + mLabAccountCollection + "?" + query);
 
   var httpClient = requestJson.createClient(baseMLABUrl);
@@ -32,6 +32,39 @@ function getAccountByIdV1(req, res) {
       } else {
         if (body.length > 0) {
           var response = body;
+        } else {
+          var response = {
+            "msg" : "ERROR: account not found"
+          }
+          res.status(404);
+        }
+      }
+      res.send(response);
+    }
+  )
+}
+
+function getAccountByIdV1(req, res) {
+  console.log("GET /vibank/v1/account/:idaccount")
+  console.log()
+  var idAccount = Number.parseInt(req.params.idaccount);
+  console.log("Function getAccountByIdV1 - The account id is -> " + idAccount);
+  var query = "q=" + JSON.stringify({"id": idAccount});
+  console.log("Function getAccountByIdV1 - The query is -> " + mLabAccountCollection + "?" + query);
+
+  var httpClient = requestJson.createClient(baseMLABUrl);
+  console.log(query);
+  // Control the response status
+  httpClient.get(mLabAccountCollection + "?" + query + "&" + mLabAPIKey,
+    function(err, resMlab, body) {
+      if (err) {
+        var response = {
+          "msg" : "ERROR - getting account"
+        }
+        res.status(500);
+      } else {
+        if (body.length > 0) {
+          var response = body[0];
         } else {
           var response = {
             "msg" : "ERROR: account not found"
@@ -125,6 +158,9 @@ function createAccountV1(req,res) {
 
 // Get Account
 module.exports.getAccountByIdV1 = getAccountByIdV1;
+
+// Get Accounts
+module.exports.getAccountsByIdUserV1 = getAccountsByIdUserV1;
 
 // Create Account
 module.exports.createAccountV1 = createAccountV1;
