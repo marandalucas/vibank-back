@@ -12,23 +12,6 @@ const mLabParamsCollection = "vibankparameters";
 ////// FUNCTIONS //////
 ///////////////////////
 
-// Get all operations of account V1
-function getOpersV1(req, res) {
-  console.log("GET /vibank/v1/oper");
-
-  var httpClient = requestJson.createClient(baseMLABUrl);
-  console.log("Function getOpersV1 - getting vibank operations account");
-
-  httpClient.get(mLabOperCollection + "?"  + mLabAPIKey,
-    function(err, resMlab, body) {
-      var response = !err ? body : {
-        "msg" : "ERROR getting vibank operations account"
-      }
-      res.send(response);
-    }
-  );
-}
-
 // Get Operation By ID V1
 function getOpersByIdV1(req, res) {
   console.log("GET /vibank/v1/oper/:id")

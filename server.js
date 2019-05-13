@@ -66,9 +66,6 @@ app.get("/vibank/v1/accounts/:id", AccountController.getAccountsByIdUserV1);
 // Create account
 app.post("/vibank/v1/account/", AccountController.createAccountV1);
 
-// Get account opers V1
-app.get("/vibank/v1/oper", operController.getOpersV1);
-
 // Get account oper by ID V1
 app.get("/vibank/v1/oper/:id", operController.getOpersByIdV1);
 
