@@ -59,3 +59,8 @@ Test your rest api with postman or other tools.
 docker tag vibank-back yourdockerhubuser/vibank-back
 docker push yourdockerhubuser/vibank-back
 ```
+
+## Example to test SNAPSHOT IMAGE
+```
+docker run -e MLAB_API_KEY=changeForYouApiKey -d -p 3000:3000 sockmal/vibank-back:1.2.0-SNAPSHOT
+```
