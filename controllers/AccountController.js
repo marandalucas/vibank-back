@@ -15,9 +15,9 @@ function getAccountsByIdUserV1(req, res) {
   console.log("GET /vibank/v1/accounts/:id")
 
   var idUser = Number.parseInt(req.params.id);
-  console.log("Function getAccountByIdV1 - The account idUser is -> " + idUser);
-  var query = "q=" + JSON.stringify({"userID": idUser});
-  console.log("Function getAccountByIdV1 - The query is -> " + mLabAccountCollection + "?" + query);
+  console.log("Function getAccountsByIdUserV1 - The account idUser is -> " + idUser);
+  var query = "q=" + JSON.stringify({"idUser": idUser});
+  console.log("Function getAccountsByIdUserV1 - The query is -> " + mLabAccountCollection + "?" + query);
 
   var httpClient = requestJson.createClient(baseMLABUrl);
   console.log(query);
@@ -49,7 +49,7 @@ function getAccountByIdV1(req, res) {
   console.log()
   var idAccount = Number.parseInt(req.params.idaccount);
   console.log("Function getAccountByIdV1 - The account id is -> " + idAccount);
-  var query = "q=" + JSON.stringify({"id": idAccount});
+  var query = "q=" + JSON.stringify({"idAccount": idAccount});
   console.log("Function getAccountByIdV1 - The query is -> " + mLabAccountCollection + "?" + query);
 
   var httpClient = requestJson.createClient(baseMLABUrl);
@@ -65,6 +65,7 @@ function getAccountByIdV1(req, res) {
       } else {
         if (body.length > 0) {
           var response = body[0];
+          console.log("Mi respuesta" + response);
         } else {
           var response = {
             "msg" : "ERROR: account not found"
@@ -108,17 +109,17 @@ function createAccountV1(req,res) {
       }
 
       // Increase acccountID +1
-      var accountID = body[0].value +1;
+      var idAccount = body[0].value +1;
 
       // Define newAccount body json
       var newAccount={
         "IBAN": randomAccount,
-        "accountID": accountID,
-        "userID" :req.body.userID,
+        "idAccount": idAccount,
+        "idUser" :req.body.idUser,
         "balance" :req.body.balance
       }
       // Updating accoudID value
-      putBody = '{"$set":{"value":' + accountID + '}}';
+      putBody = '{"$set":{"value":' + idAccount + '}}';
       httpClient.put(mLabParamsCollection + "?" + query + "&" + mLabAPIKey, JSON.parse(putBody),
       function(errUpParams,resMLabUpParams, bodyUpParams){
         if(errUpParams){

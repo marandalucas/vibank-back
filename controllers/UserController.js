@@ -11,23 +11,6 @@ const mLabParamsCollection = "vibankparameters";
 ////// FUNCTIONS //////
 ///////////////////////
 
-// Get all users V1
-function getUsersV1(req, res) {
-  console.log("GET /vibank/v1/user");
-
-  var httpClient = requestJson.createClient(baseMLABUrl);
-  console.log("Function getUsersV1 - getting vibank users");
-
-  httpClient.get(mLabUserCollection + "?"  + mLabAPIKey,
-    function(err, resMlab, body) {
-      var response = !err ? body : {
-        "msg" : "ERROR getting vibank users"
-      }
-      res.send(response);
-    }
-  );
-}
-
 // Get User By ID V1
 function getUsersByIdV1(req, res) {
   console.log("GET /vibank/v1/user/:id")
@@ -90,6 +73,7 @@ function createUserV1(req,res) {
         "msg": "ERROR - getting userCount"
       }
       res.status(500);
+      res.send(response);
     }else {
       if (body.length > 0) {
 
@@ -116,11 +100,9 @@ function createUserV1(req,res) {
               "msg": "ERROR creating user"
             }
             res.status(500);
+            res.send(response);
           }else {
-            var response = {
-              "msg": "SUCCESS created user"
-            }
-            res.status(201);
+
             // Updating userID value
             putBody = '{"$set":{"value":' + userID + '}}';
             httpClient.put(mLabParamsCollection + "?" + query + "&" + mLabAPIKey, JSON.parse(putBody),
@@ -130,15 +112,17 @@ function createUserV1(req,res) {
                   "msg": "ERROR updated new userID"
                 }
                 res.status(500);
+                res.send(response);
               }else {
                 var response = {
-                  "msg": "SUCESS updated new userID and user Created"
+                  "msg": "SUCESS updated new userID and user Created",
+                  "idUser":userID
                 }
                 res.status(201);
+                res.send(response);
               }
             }
             );
-            res.send(response);
           }
         }
         );
@@ -147,6 +131,7 @@ function createUserV1(req,res) {
           "msg" : "ERROR: userCount not found"
         }
         res.status(404);
+        res.send(response);
       }
     }
   }
@@ -159,7 +144,6 @@ function createUserV1(req,res) {
 /////////////////////////////
 
 // Get Users V1
-module.exports.getUsersV1 = getUsersV1;
 module.exports.getUsersByIdV1 = getUsersByIdV1;
 
 // Create User V1

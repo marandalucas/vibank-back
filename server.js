@@ -42,9 +42,6 @@ app.use(enableCORS); // Enabled to use CORS
 ///// DEFINE API METHODS/////
 /////////////////////////////
 
-// Get users V1
-app.get("/vibank/v1/user", userController.getUsersV1);
-
 // Get users by ID V1
 app.get("/vibank/v1/user/:id", userController.getUsersByIdV1);
 
