@@ -11,6 +11,13 @@ const mLabParamsCollection = "vibankparameters";
 ////// FUNCTIONS //////
 ///////////////////////
 
+function getPathV1(req, res) {
+  console.log("GET /")
+  res.status(200);
+  response = "PATH SUCCESS"
+  res.send(response);
+}
+
 // Get User By ID V1
 function getUsersByIdV1(req, res) {
   console.log("GET /vibank/v1/user/:id")
@@ -142,6 +149,9 @@ function createUserV1(req,res) {
 
 ////// MODULE EXPORTS ///////
 /////////////////////////////
+
+// Get Users V1
+module.exports.getPathV1 = getPathV1;
 
 // Get Users V1
 module.exports.getUsersByIdV1 = getUsersByIdV1;
