@@ -6,26 +6,10 @@ const crypt =require("../utils/crypt"); // Import encrypt Library
 const baseMLABUrl = "https://api.mlab.com/api/1/databases/apitechumal12ed/collections/";
 const mLabAPIKey = "apiKey=" + process.env.MLAB_API_KEY;
 const mLabUserCollection = "vibankuser";
+const mLabParamsCollection = "vibankparameters";
 
 ////// FUNCTIONS //////
 ///////////////////////
-
-// Get all users V1
-function getUsersV1(req, res) {
-  console.log("GET /vibank/v1/user");
-
-  var httpClient = requestJson.createClient(baseMLABUrl);
-  console.log("Function getUsersV1 - getting vibank users");
-
-  httpClient.get(mLabUserCollection + "?"  + mLabAPIKey,
-    function(err, resMlab, body) {
-      var response = !err ? body : {
-        "msg" : "ERROR getting vibank users"
-      }
-      res.send(response);
-    }
-  );
-}
 
 // Get User By ID V1
 function getUsersByIdV1(req, res) {
@@ -77,29 +61,89 @@ function createUserV1(req,res) {
   console.log(newUser);
   var httpClient=requestJson.createClient(baseMLABUrl);
 
-  httpClient.post(mLabUserCollection + "?" +mLabAPIKey,newUser,
+  // Get current userID
+  var query = "q=" + JSON.stringify({"idparam":"userCount"});
+  console.log("Function createUserV1 - The query is -> " + mLabUserCollection + "?" + query);
+
+  var httpClient=requestJson.createClient(baseMLABUrl);
+  httpClient.get(mLabParamsCollection + "?" + query + "&" + mLabAPIKey,
   function(err,resMlab, body){
     if(err){
       var response = {
-        "msg": "ERROR creating user"
+        "msg": "ERROR - getting userCount"
       }
       res.status(500);
+      res.send(response);
     }else {
-      var response = {
-        "msg": "SUCCESS created user"
+      if (body.length > 0) {
+
+        // Increase userID +1
+        userID = body[0].value +1;
+
+        // Define newUser body json
+        var newUser={
+          "id" :userID,
+          "first_name" :req.body.first_name,
+          "last_name" :req.body.last_name,
+          "email" :req.body.email,
+          "password" :crypt.hash(req.body.password)
+        }
+
+        // Print info about new user
+        console.log("Creating new user " + newUser.first_name + " with userID " + userID);
+
+        // Create User with id, first_name, last_name, email and password
+        httpClient.post(mLabUserCollection + "?" +mLabAPIKey,newUser,
+        function(errCreateUser,resMlabUser, bodyCreateUser){
+          if(errCreateUser){
+            var response = {
+              "msg": "ERROR creating user"
+            }
+            res.status(500);
+            res.send(response);
+          }else {
+
+            // Updating userID value
+            putBody = '{"$set":{"value":' + userID + '}}';
+            httpClient.put(mLabParamsCollection + "?" + query + "&" + mLabAPIKey, JSON.parse(putBody),
+            function(errUpParams,resMLabUpParams, bodyUpParams){
+              if(errUpParams){
+                var response = {
+                  "msg": "ERROR updated new userID"
+                }
+                res.status(500);
+                res.send(response);
+              }else {
+                var response = {
+                  "msg": "SUCESS updated new userID and user Created",
+                  "idUser":userID
+                }
+                res.status(201);
+                res.send(response);
+              }
+            }
+            );
+          }
+        }
+        );
+      } else {
+        var response = {
+          "msg" : "ERROR: userCount not found"
+        }
+        res.status(404);
+        res.send(response);
       }
-      res.status(201);
     }
-    res.send(response);
   }
   );
+
+
 }
 
 ////// MODULE EXPORTS ///////
 /////////////////////////////
 
 // Get Users V1
-module.exports.getUsersV1 = getUsersV1;
 module.exports.getUsersByIdV1 = getUsersByIdV1;
 
 // Create User V1

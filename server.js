@@ -42,9 +42,6 @@ app.use(enableCORS); // Enabled to use CORS
 ///// DEFINE API METHODS/////
 /////////////////////////////
 
-// Get users V1
-app.get("/vibank/v1/user", userController.getUsersV1);
-
 // Get users by ID V1
 app.get("/vibank/v1/user/:id", userController.getUsersByIdV1);
 
@@ -57,14 +54,14 @@ app.post("/vibank/v1/login", authController.loginUserV1);
 // Post Logout users V1
 app.post("/vibank/v1/logout/:id", authController.logoutUserV1);
 
-// Get account by ID V1
-app.get("/vibank/v1/account/:id", AccountController.getAccountByIdV1);
+// Get account by Account ID V1
+app.get("/vibank/v1/account/:idaccount", AccountController.getAccountByIdV1);
+
+// Get accounts by User ID V1
+app.get("/vibank/v1/accounts/:id", AccountController.getAccountsByIdUserV1);
 
 // Create account
 app.post("/vibank/v1/account/", AccountController.createAccountV1);
-
-// Get account opers V1
-app.get("/vibank/v1/oper", operController.getOpersV1);
 
 // Get account oper by ID V1
 app.get("/vibank/v1/oper/:id", operController.getOpersByIdV1);

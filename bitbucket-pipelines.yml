@@ -30,7 +30,7 @@ pipelines:
           name: Build Docker Image & Docker Push Image
           script:
             # Get Project Version
-            - export IMAGE_TAG="$(node -e "console.log(require('./package.json').version);")"
+            - export IMAGE_TAG="$(awk '/version/{gsub(/("|",)/,"",$2);print $2};' package.json)"
             - export IMAGE_TAG_SNAPSHOT=${IMAGE_TAG}-SNAPSHOT
             - export IMAGE_NAME=${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_BACK_NAME}:${IMAGE_TAG_SNAPSHOT}
             # build the Docker image (this will use the Dockerfile in the root of the repo)
@@ -38,6 +38,7 @@ pipelines:
             # authenticate with the Docker Hub registry
             - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
             # push the new Docker image to the Docker registry
+            - echo "Docker Image to Push --> ${IMAGE_NAME}"
             - docker push $IMAGE_NAME
     master:
       - step:
@@ -51,18 +52,23 @@ pipelines:
           name: Build Docker Image & Docker Push Image
           script:
             # Get Project Version
-            - export IMAGE_TAG="$(node -e "console.log(require('./package.json').version);")"
-            - export IMAGE_NAME=${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_BACK_NAME}:$IMAGE_TAG
+            - export IMAGE_TAG="$(awk '/version/{gsub(/("|",)/,"",$2);print $2};' package.json)"
+            - export IMAGE_NAME=${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_BACK_NAME}:${IMAGE_TAG}
             # build the Docker image (this will use the Dockerfile in the root of the repo)
             - docker build -t $IMAGE_NAME .
             # authenticate with the Docker Hub registry
             - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
             # push the new Docker image to the Docker registry
+            - echo "Docker Image to Push --> ${IMAGE_NAME}"
             - docker push $IMAGE_NAME
       - step:
           name: Deploy on kubernetes
           image: sockmal/gcloud-kubectl:1.0.0
           script:
+            # Get Project Version
+            - export IMAGE_TAG="$(awk '/version/{gsub(/("|",)/,"",$2);print $2};' package.json)"
+            - export IMAGE_NAME=${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_BACK_NAME}:${IMAGE_TAG}
+
             # Prepare environment
             - export CLOUDSDK_COMPUTE_ZONE=$GCLOUD_COMPUTE_ZONE
             - export CLOUDSDK_CORE_PROJECT=$GCLOUD_CORE_PROJECT
@@ -78,4 +84,5 @@ pipelines:
             - kubectl cluster-info
 
             # Update the deployment to use the new Docker image
-            - kubectl set image deployment/${DOCKER_IMAGE_BACK_NAME} ${DOCKER_IMAGE_BACK_NAME}=${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_BACK_NAME}:$IMAGE_TAG
+            - echo "Docker Image to Deploy on kubernetes --> ${IMAGE_NAME}"
+            - kubectl set image deployment/${DOCKER_IMAGE_BACK_NAME} ${DOCKER_IMAGE_BACK_NAME}=${IMAGE_NAME}
