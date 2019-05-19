@@ -2,7 +2,7 @@
 ///// DECLARE CONST /////
 /////////////////////////
 const requestJson = require('request-json'); // Para cargar la librería de request-json
-const crypt =require("../utils/crypt"); // Cargamos librería de encriptación
+const jwt = require('jsonwebtoken'); // Import jsonwebtoken Library
 
 const baseMLABUrl = "https://api.mlab.com/api/1/databases/apitechumal12ed/collections/";
 const mLabAPIKey = "apiKey=" + process.env.MLAB_API_KEY;
@@ -12,36 +12,62 @@ const mLabParamsCollection = "vibankparameters";
 ////// FUNCTIONS //////
 ///////////////////////
 function getAccountsByIdUserV1(req, res) {
+
   console.log("GET /vibank/v1/accounts/:id")
 
-  var idUser = Number.parseInt(req.params.id);
-  console.log("Function getAccountsByIdUserV1 - The account idUser is -> " + idUser);
-  var query = "q=" + JSON.stringify({"idUser": idUser});
-  console.log("Function getAccountsByIdUserV1 - The query is -> " + mLabAccountCollection + "?" + query);
+  if(!req.headers['authorization']) {
 
-  var httpClient = requestJson.createClient(baseMLABUrl);
-  console.log(query);
-  // Control the response status
-  httpClient.get(mLabAccountCollection + "?" + query + "&" + mLabAPIKey,
-    function(err, resMlab, body) {
-      if (err) {
-        var response = {
-          "msg" : "ERROR - getting account"
-        }
-        res.status(500);
-      } else {
-        if (body.length > 0) {
-          var response = body;
-        } else {
-          var response = {
-            "msg" : "ERROR: account not found"
-          }
-          res.status(404);
-        }
+      var response = {
+        "msg" : "Petición sin cabecera"
       }
+      res.status(401);
       res.send(response);
-    }
-  )
+
+  }else{
+
+    var token = req.headers['authorization'];
+    console.log("el token es:" + token);
+    token = token.replace('Bearer ', '')
+
+    jwt.verify(token, 'Secret Password', function(err, token) {
+      if (err) {
+          var response = {
+            "msg" : "Token invalido"
+          }
+          res.status(401);
+          res.send(response);
+      } else {
+
+          var idUser = Number.parseInt(req.params.id);
+          console.log("Function getAccountsByIdUserV1 - The account idUser is -> " + idUser);
+          var query = "q=" + JSON.stringify({"idUser": idUser});
+          console.log("Function getAccountsByIdUserV1 - The query is -> " + mLabAccountCollection + "?" + query);
+
+          var httpClient = requestJson.createClient(baseMLABUrl);
+          // Control the response status
+          httpClient.get(mLabAccountCollection + "?" + query + "&" + mLabAPIKey,
+            function(err, resMlab, body) {
+              if (err) {
+                var response = {
+                  "msg" : "ERROR - getting account"
+                }
+                res.status(500);
+              } else {
+                if (body.length > 0) {
+                  var response = body;
+                } else {
+                  var response = {
+                    "msg" : "ERROR: account not found"
+                  }
+                  res.status(404);
+                }
+              }
+              res.send(response);
+            }
+          )
+      }
+    })
+  }
 }
 
 function getAccountByIdV1(req, res) {

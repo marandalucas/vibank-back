@@ -1,7 +1,8 @@
 ///// DECLARE CONST /////
 /////////////////////////
 const requestJson = require('request-json'); // Import request-json Library
-const crypt =require("../utils/crypt"); // Import encrypt Library
+const crypt = require("../utils/crypt"); // Import encrypt Library
+const authentic = require("../utils/authentic"); // Import autentication Library
 
 const baseMLABUrl = "https://api.mlab.com/api/1/databases/apitechumal12ed/collections/";
 const mLabAPIKey = "apiKey=" + process.env.MLAB_API_KEY;
@@ -38,9 +39,17 @@ function loginUserV1(req, res) {
         var putBody = '{"$set":{"logged":true}}';
         httpClient.put(mLabUserCollection + "?" + query + "&" + mLabAPIKey, JSON.parse(putBody),
           function(errPUT, resMLabPUT, bodyPUT) {
+
             console.log("Function loginUserV1 - SUCCESS Loggin Correct insert logged to true");
+
+            var tokenData = {
+                email: req.body.email
+            }
+            var token = authentic.createToken(tokenData);
+
             var response = {
               "msg" : "SUCCESS User Login",
+              "token": token,
               "UserID" : body[0].id
             }
             res.send(response);

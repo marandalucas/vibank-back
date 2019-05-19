@@ -2,6 +2,7 @@
 /////////////////////////
 const requestJson = require('request-json'); // Import request-json Library
 const crypt =require("../utils/crypt"); // Import encrypt Library
+const authentic = require("../utils/authentic"); // Import autentication Library
 
 const baseMLABUrl = "https://api.mlab.com/api/1/databases/apitechumal12ed/collections/";
 const mLabAPIKey = "apiKey=" + process.env.MLAB_API_KEY;
@@ -114,12 +115,21 @@ function createUserV1(req,res) {
                 res.status(500);
                 res.send(response);
               }else {
+
+                var tokenData = {
+                    email: req.body.email
+                }
+                
+                var token = authentic.createToken(tokenData);
+
                 var response = {
                   "msg": "SUCESS updated new userID and user Created",
+                  "token": token,
                   "idUser":userID
                 }
                 res.status(201);
                 res.send(response);
+
               }
             }
             );
