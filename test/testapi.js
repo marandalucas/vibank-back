@@ -15,12 +15,12 @@ const mLabAPIKey = "apiKey=" + process.env.MLAB_API_KEY;
 
 // False User and Pasword to Testing Login
 const userLoginJson = {
-  "email" : "tonystark@gmail.com",
-  "password" : "testingfalsepassword"
+  "email" : "marandalucas@gmail.com",
+  "password" : "pruebapassword"
 };
 
 // Generate random User ID to testing
-var userIDTesting = getRandomInt(1,50);
+var userIDTesting = getRandomInt(1,2);
 
 
 ////////////////////////////////
@@ -74,30 +74,6 @@ describe("Test that API mlab",
 
 describe("Test API Vibank ",
   function() {
-    it('Tests that user api return user list', function(done) {
-      chai.request('http://localhost:3000')
-      .get('/vibank/v1/user')
-      .end(
-        function(err, res) {
-          console.log("Request finished");
-          // Check that the response is 200
-          res.should.have.status(200);
-          res.body.users = res.body;
-
-          // Check that the users object content an array
-          res.body.users.should.be.a('array');
-
-          // Check that the users object have id, user and password
-          for (user of res.body.users){
-            user.should.have.property('id');
-            user.should.have.property('email');
-            user.should.have.property('password');
-          }
-          done();
-        }
-      )
-      }
-    ),
     it('Tests that user api return user by ID', function(done) {
       chai.request('http://localhost:3000')
       .get('/vibank/v1/user/' + userIDTesting)
