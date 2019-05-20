@@ -74,6 +74,7 @@ describe("Test that API mlab",
 
 describe("Test API Vibank ",
   function() {
+<<<<<<< HEAD
     // TODO: Actualizar test para funcionan con JWT
     // it('Tests that user api return user by ID', function(done) {
     //   chai.request('http://localhost:3000')
@@ -101,6 +102,34 @@ describe("Test API Vibank ",
     //   )
     //   }
     // ),
+=======
+    it('Tests that user api return user by ID', function(done) {
+      chai.request('http://localhost:3000')
+      .get('/vibank/v1/user/' + userIDTesting)
+      .end(
+        function(err, res) {
+          console.log("Request finished");
+
+          // Check that the response is 200
+          res.should.have.status(200);
+          res.body.user = res.body;
+
+          // Check that the users object content an array
+          res.body.user.should.be.a('Object');
+
+          // Check that the users object have id, user and password
+          res.body.user.should.have.property('id');
+          res.body.user.should.have.property('email');
+          res.body.user.should.have.property('password');
+
+          // Check that the users is correct
+          res.body.user.id.should.be.eql(userIDTesting);
+          done();
+        }
+      )
+      }
+    ),
+>>>>>>> 98d2ef927a825e8c7c258a651d893b4219b14f6b
     it('Tests that user api login works', function(done) {
       chai.request('http://localhost:3000')
       .post('/vibank/v1/login')
