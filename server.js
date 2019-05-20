@@ -32,10 +32,11 @@ var enableCORS = function(req, res, next) {
   res.set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
 
   // This will be needed.
-  res.set("Access-Control-Allow-Headers", "Content-Type");
+  res.set("Access-Control-Allow-Headers", "Content-Type, authorization");
 
   next();
  }
+
 app.use(enableCORS); // Enabled to use CORS
 
 
