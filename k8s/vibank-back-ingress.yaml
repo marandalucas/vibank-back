@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: vibank-back-ingress
+spec:
+  tls:
+  - secretName: api-vibank-ssl
+  rules:
+  - host: api.vibank.tk
+    http:
+      paths:
+      - backend:
+          serviceName: vibank-back
+          servicePort: 8080
