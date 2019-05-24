@@ -14,13 +14,18 @@ spec:
     spec:
       containers:
       - name: vibank-back
-        image: sockmal/vibank-back:1.3.0
+        image: sockmal/vibank-back:1.4.0
         env:
           - name: MLAB_API_KEY
             valueFrom:
               secretKeyRef:
                 name: vibank-back-secret
                 key: mlabapikey
+          - name: JWT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: vibank-back-secret
+                key: jwttoken
         ports:
         - containerPort: 3000
         resources:
