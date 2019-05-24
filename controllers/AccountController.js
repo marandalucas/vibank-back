@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken'); // Import jsonwebtoken Library
 
 const baseMLABUrl = "https://api.mlab.com/api/1/databases/apitechumal12ed/collections/";
 const mLabAPIKey = "apiKey=" + process.env.MLAB_API_KEY;
+const jwtToken = process.env.JWT_TOKEN;
 const mLabAccountCollection = "vibankaccount";
 const mLabParamsCollection = "vibankparameters";
 
@@ -32,7 +33,7 @@ function getAccountsByIdUserV1(req, res) {
     token = token.replace('Bearer ', '')
 
     // validacion de usuario autorizado mediante token
-    jwt.verify(token, 'Secret Password', function(err, token) {
+    jwt.verify(token, jwtToken, function(err, token) {
       if (err) {
           var response = {
             "msg" : "Token invalido"
@@ -94,7 +95,7 @@ function getAccountByIdV1(req, res) {
       token = token.replace('Bearer ', '')
 
       // validacion de usuario autorizado mediante token
-      jwt.verify(token, 'Secret Password', function(err, token) {
+      jwt.verify(token, jwtToken, function(err, token) {
         if (err) {
             var response = {
               "msg" : "Token invalido"
@@ -159,7 +160,7 @@ function createAccountV1(req,res) {
       token = token.replace('Bearer ', '')
 
       // validacion de usuario autorizado mediante token
-      jwt.verify(token, 'Secret Password', function(err, token) {
+      jwt.verify(token, jwtToken, function(err, token) {
         if (err) {
             var response = {
               "msg" : "Token invalido"
